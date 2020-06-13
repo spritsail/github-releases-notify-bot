@@ -1,0 +1,39 @@
+---
+kind: pipeline
+name: default
+
+platform:
+  os: linux
+  arch: amd64
+
+steps:
+- name: build
+  pull: always
+  image: spritsail/docker-build
+  settings:
+    path: https://github.com/pyatyispyatil/github-releases-notify-bot.git
+    repo: notify-bot-dev
+
+- name: publish
+  pull: always
+  image: spritsail/docker-publish
+  settings:
+    from: notify-bot-dev
+    repo: spritsail/github-releases-notify-bot
+    tags:
+    - latest
+    username:
+      from_secret: docker_username
+    password:
+      from_secret: docker_password
+  when:
+    branch:
+    - master
+    event:
+    - push
+
+---
+kind: signature
+hmac: 30bc93aa03d828dba810f061bc334d78649ad0afd9d07f356906829d79255cf3
+
+...
